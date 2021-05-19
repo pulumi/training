@@ -19,7 +19,7 @@ class Cluster(ComponentResource):
                  args: ClusterArgs,
                  opts: ResourceOptions = None):
 
-        # Leave this line. You can modify 'customer:resoure:Cluster' if you want
+        # Leave this line. You can modify 'custom:resource:Cluster' if you want
         super().__init__('custom:resource:Cluster', name, {}, opts)
 
         # Create the resources. 

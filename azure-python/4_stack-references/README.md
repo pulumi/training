@@ -8,7 +8,7 @@ There are two project directories:
 
 ## Main Exercise Steps
 
-- Create two directories for each project: `mkdir base_infra app`
+- Create two directories for each project: `mkdir base_cluster app`
 - Pull down the base_infra project:
   - `cd base_cluster`
   - `pulumi new <base_cluster-URL>`
