@@ -1,18 +1,4 @@
-## Exercise 1: Move the AKS Cluster Related Resources into a component resource module.
-## Hint: The block of resources to move is marked with "### AKS Cluster Resoures"
-## It should take as input parameters: 
-## - config values used by the resources.
-## - resource group name
-## It should provide the following outputs: 
-## - K8s kubeconfig
-# Component Resources Doc: https://www.pulumi.com/docs/intro/concepts/resources/#components
-# Example Code: https://github.com/pulumi/examples/blob/master/azure-py-virtual-data-center/spoke.py
-
-## Exercise 2: Add the "protect" resource option to the "cluster" resource and do a `pulumi up` and then a `pulumi destroy`
-## Note how the component resource children get the protect option enabled.
-## Note how you can't destroy the stack as long as protect is true.
-# Doc: https://www.pulumi.com/docs/intro/concepts/resources/#protect
-# Doc: https://www.pulumi.com/docs/reference/cli/pulumi_state_unprotect/
+# See EXERCISES.md
 
 import pulumi
 from pulumi import Config, ResourceOptions
@@ -26,18 +12,10 @@ import cluster
 
 # Config values or defaults
 config = Config()
-k8s_version = config.get('k8sVersion') or '1.18.14'
+k8s_version = config.get('k8sVersion') or '1.19.11'
 admin_username = config.get('adminUserName') or 'testuser'
 node_count = config.get_int('nodeCount') or 2
 node_size = config.get('nodeSize') or 'Standard_D2_v2'
-password = config.get_secret("password")
-if not password:
-    rando_password=random.RandomPassword('password',
-        length=16,
-        special=True,
-        override_special='@_#',
-        )
-    password=rando_password.result 
 
 # Resource Group
 resource_group = resources.ResourceGroup('rg')
@@ -45,7 +23,6 @@ resource_group = resources.ResourceGroup('rg')
 # Create a cluster resource using our custom component resource class
 cluster = cluster.Cluster('k8scluster', cluster.ClusterArgs(
     resource_group_name=resource_group.name,
-    password=password,
     node_count=node_count,
     node_size=node_size,
     k8s_version=k8s_version,

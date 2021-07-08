@@ -6,7 +6,7 @@ There are two project directories:
 - base_cluster: stands up a base AKS cluster and exports the kubeconfig.
 - app: deploys a simple app on a K8s cluster.
 
-## Main Exercise Steps
+# Set Up Environment
 
 - Create two directories for each project: `mkdir base_cluster app`
 - Pull down the base_infra project:
@@ -16,8 +16,5 @@ There are two project directories:
 - Pull down the app project:
   - `cd ../app`
   - `pulumi new <app-URL>`
-  - Add stack references to the `app` project to get the kubeconfig from the the `base_cluster` stack.  
-    Docs: https://www.pulumi.com/docs/intro/concepts/stack/#stackreferences
-  - `pulumi up`
-
-See the `solutions` folder for the answers.
+  - See EXERCISES.md for the exercises.
+  - See the `solutions` folder for the answers.

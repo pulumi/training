@@ -12,7 +12,6 @@ class ClusterArgs:
     def __init__(self,
                  # name the arguments and their types (e.g. str, bool, etc)
                  resource_group_name: str,
-                 password:str,
                  node_count:int,
                  node_size:str,
                  k8s_version:str,
@@ -21,7 +20,6 @@ class ClusterArgs:
 
         # Set the class args
         self.resource_group_name = resource_group_name
-        self.password = password
         self.node_count = node_count
         self.node_size = node_size
         self.k8s_version = k8s_version
@@ -47,23 +45,8 @@ class Cluster(ComponentResource):
             algorithm='RSA', rsa_bits=4096, opts=ResourceOptions(parent=self))
         ssh_public_key = generated_key_pair.public_key_openssh
 
-        ad_app = azuread.Application('app', display_name='app', opts=ResourceOptions(parent=self))
-        ad_sp = azuread.ServicePrincipal('service-principal',
-            application_id=ad_app.application_id,
-            opts=ResourceOptions(parent=self))
-        ad_sp_password = azuread.ServicePrincipalPassword('sp-pwd',
-            service_principal_id=ad_sp.id,
-            value=args.password,
-            end_date='2099-01-01T00:00:00Z',
-            opts=ResourceOptions(parent=self))
-
         k8s_cluster = containerservice.ManagedCluster(f'{name}-k8s',
             resource_group_name=args.resource_group_name,
-            addon_profiles={
-                'KubeDashboard': {
-                    'enabled': True,
-                },
-            },
             agent_pool_profiles=[{
                 'count': args.node_count,
                 'max_pods': 20,
@@ -86,10 +69,8 @@ class Cluster(ComponentResource):
                     }],
                 },
             },
-            node_resource_group='node-resource-group',
-            service_principal_profile={
-                'client_id': ad_app.application_id,
-                'secret': ad_sp_password.value,
+            identity={
+                'type': 'SystemAssigned'
             },
             opts=ResourceOptions(parent=self))
 

@@ -1,5 +1,4 @@
-## Exercise 1: Add stack references to get the kubeconfig from the "base_cluster" stack.
-# Doc: https://www.pulumi.com/docs/intro/concepts/stack/#stackreferences
+# See EXERCISES.md
 
 import pulumi
 from pulumi import ResourceOptions
