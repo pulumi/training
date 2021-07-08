@@ -12,21 +12,8 @@ import config
 
 resource_group = resources.ResourceGroup('rg')
 
-ad_app = azuread.Application('app', display_name='app')
-ad_sp = azuread.ServicePrincipal('service-principal',
-    application_id=ad_app.application_id)
-ad_sp_password = azuread.ServicePrincipalPassword('sp-password',
-    service_principal_id=ad_sp.id,
-    value=config.password,
-    end_date='2099-01-01T00:00:00Z')
-
 k8s_cluster = containerservice.ManagedCluster('cluster',
     resource_group_name=resource_group.name,
-    addon_profiles={
-        'KubeDashboard': {
-            'enabled': True,
-        },
-    },
     agent_pool_profiles=[{
         'count': config.node_count,
         'max_pods': 20,
@@ -49,10 +36,8 @@ k8s_cluster = containerservice.ManagedCluster('cluster',
             }],
         },
     },
-    node_resource_group='node-resource-group',
-    service_principal_profile={
-        'client_id': ad_app.application_id,
-        'secret': ad_sp_password.value,
+    identity={
+        'type': 'SystemAssigned'
     })
 
 # Obtaining the kubeconfig from an Azure K8s cluster requires using the "list_managed_clsuter_user_credentials"
@@ -75,8 +60,3 @@ kubeconfig = Output.secret(creds.kubeconfigs[0].value.apply(
 # The K8s provider which supplies the helm chart resource needs to know how to talk to the K8s cluster.
 # So, instantiate a K8s provider using the retrieved kubeconfig.
 k8s_provider = k8s.Provider('k8s-provider', kubeconfig=kubeconfig)
-
-## Exercise 4 
-## For parity with Exercise 2, we'll create a local copy of the password so main can export it.
-## The nice thing is that it's secrecy attribute is maintained.
-password = config.password
