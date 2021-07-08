@@ -11,7 +11,7 @@ from pulumi_kubernetes.helm.v3 import Chart, ChartOpts
 
 
 config = Config()
-k8s_version = config.get('k8sVersion') or '1.18.14'
+k8s_version = config.get('k8sVersion') or '1.19.11'
 node_count = config.get_int('nodeCount') or 2
 node_size = config.get('nodeSize') or 'Standard_D2_v2'
 
