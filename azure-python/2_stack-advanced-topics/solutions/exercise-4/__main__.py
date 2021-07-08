@@ -39,4 +39,3 @@ pulumi.export('apache_url_using_apply', apache_service_ip.apply(lambda ip: f'htt
 ## Exercise 4
 ## Now that kubeconfig and password come via the cluster module, the export is updated to reference it as such.
 pulumi.export('kubeconfig', cluster.kubeconfig)
-pulumi.export('password', cluster.password)
