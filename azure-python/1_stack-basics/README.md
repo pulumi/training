@@ -7,6 +7,6 @@ Exercises and solutions for Pulumi stack basics:
 - Create and use plain-text stack-specific configuration.
 - (Optional) Investigate explicit resource naming vs resource autonaming
 
-See the prolog section of the main program file for the exercises.
+See EXERCISES.md for the exercises.
 
 See the `solutions` folder for the answers.

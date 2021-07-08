@@ -1,4 +1,4 @@
-## Exercise 1: See the `app` directory.
+# See EXERCISES.md
 
 import pulumi
 from pulumi import Config, ResourceOptions
