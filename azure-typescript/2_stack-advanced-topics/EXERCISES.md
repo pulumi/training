@@ -1,7 +1,7 @@
 # Exercise 1: 
-Create and use a configuration secret for the linux admin user name, and create a stack output with the value.   
-NOTE: The code as written now will fail since there is a reference to an admin user name variable that is not set.   
-The goal of this exercise is to address that by storing the user name in the stack config as a secret and then getting the value in the code.   
+Create and use a configuration secret for the linux password, and create a stack output with the value.   
+NOTE: The code as written now will fail since there is a reference to a password variable that is not set.   
+The goal of this exercise is to address that by storing the password in the stack config as a secret and then getting the value in the code.   
 And, when exported as a stack output, you will see that Pulumi will keep it as a secret.  
 Furthermore, secrets are not displayed in logs or in the Pulumi Console (SaaS).  
 VALIDATION: Look at the stack config file and see that the password is stored as encrypted data.  
@@ -11,7 +11,7 @@ Related Docs:
 - Secrets Doc: https://www.pulumi.com/docs/intro/concepts/secrets
 
 # Exercise 2: 
-Programmatically set the kubeconfig obtained from the K8s cluster as a secret in the code and make it a stack output.  
+XXXXXXX Programmatically set the kubeconfig obtained from the K8s cluster as a secret in the code and make it a stack output.  
 
 Related Docs:
 - Programmatic Secrets Doc: https://www.pulumi.com/docs/intro/concepts/secrets/#programmatically-creating-secret

@@ -1,91 +1,135 @@
-import * as containerservice from "@pulumi/azure-native/containerservice";
-import * as resources from "@pulumi/azure-native/resources";
-import * as azuread from "@pulumi/azuread";
-import * as k8s from "@pulumi/kubernetes";
+import * as insights from "@pulumi/azure-native/insights";
+import * as resource from "@pulumi/azure-native/resources";
+import * as sql from "@pulumi/azure-native/sql";
+import * as storage from "@pulumi/azure-native/storage";
+import * as web from "@pulumi/azure-native/web";
 import * as pulumi from "@pulumi/pulumi";
-import * as tls from "@pulumi/tls";
 
+
+// Get the password to use for SQL from config.
 const config = new pulumi.Config();
 const baseName = config.get("baseName") || pulumi.getStack();
-const k8sVersion = config.get("k8sVersion") || "1.19.11";
-const nodeCount = config.getNumber("nodeCount") || 2;
-const nodeSize = config.get("nodeSize") || "Standard_D2_v2";
+const username = config.get("sqlUsername") || "pulumi";
+const pwd = config.require("sqlPassword");
 
-const generatedKeyPair = new tls.PrivateKey("ssh-key", {
-    algorithm: "RSA",
-    rsaBits: 4096,
-});
-const sshPublicKey = generatedKeyPair.publicKeyOpenssh;
+const resourceGroup = new resource.ResourceGroup(`${baseName}-rg`);
 
-const resourceGroup = new resources.ResourceGroup(`${baseName}-rg`);
-
-const adApp = new azuread.Application(`${baseName}-app`, {
-    displayName: "app",
-});
-
-const adSp = new azuread.ServicePrincipal(`${baseName}-sp`, {
-    applicationId: adApp.applicationId,
-});
-
-const adSpPassword = new azuread.ServicePrincipalPassword(`${baseName}-passwd`, {
-    servicePrincipalId: adSp.id,
-});
-
-const k8sCluster = new containerservice.ManagedCluster(`${baseName}-k8s`, {
+// Storage Account name must be lowercase and cannot have any dash characters
+const storageAccount = new storage.StorageAccount(`${baseName.toLowerCase()}sa`, {
     resourceGroupName: resourceGroup.name,
-    agentPoolProfiles: [{
-        count: nodeCount,
-        maxPods: 110,
-        mode: "System",
-        name: "agentpool",
-        nodeLabels: {},
-        osDiskSizeGB: 30,
-        osType: "Linux",
-        type: "VirtualMachineScaleSets",
-        vmSize: nodeSize,
-    }],
-    dnsPrefix: resourceGroup.name,
-    enableRBAC: true,
-    kubernetesVersion: k8sVersion,
-    linuxProfile: {
-        adminUsername: adminUserName,
-        ssh: {
-            publicKeys: [{
-                keyData: sshPublicKey,
-            }],
-        },
-    },
-    nodeResourceGroup: "node-resource-group",
-    servicePrincipalProfile: {
-        clientId: adApp.applicationId,
-        secret: adSpPassword.value,
+    kind: storage.Kind.StorageV2,
+    sku: {
+        name: storage.SkuName.Standard_LRS,
     },
 });
 
-const creds = containerservice.listManagedClusterUserCredentialsOutput({
+const storageAccountKeys = pulumi.all([resourceGroup.name, storageAccount.name]).apply(([resourceGroupName, accountName]) =>
+    storage.listStorageAccountKeys({ resourceGroupName, accountName }));
+const primaryStorageKey = storageAccountKeys.keys[0].value;
+
+const appServicePlan = new web.AppServicePlan(`${baseName}-asp`, {
     resourceGroupName: resourceGroup.name,
-    resourceName: k8sCluster.name,
-});
-
-const kubeconfig =
-    creds.kubeconfigs[0].value
-        .apply(enc => Buffer.from(enc, "base64").toString());
-
-const k8sProvider = new k8s.Provider("k8s-provider", {
-    kubeconfig: kubeconfig,
-});
-
-const apache = new k8s.helm.v3.Chart(`${baseName}-apache`,
-    {
-        chart: "apache",
-        version: "8.3.2",
-        fetchOpts: {
-            repo: "https://charts.bitnami.com/bitnami",
-        },
+    kind: "App",
+    sku: {
+        name: "B1",
+        tier: "Basic",
     },
-    { provider: k8sProvider },
-);
+});
 
-export let apacheServiceIP = apache
-    .getResourceProperty("v1/Service", "apache-chart", "status")
-    .apply(status => status.loadBalancer.ingress[0].ip);
+const storageContainer = new storage.BlobContainer(`${baseName}-container`, {
+    resourceGroupName: resourceGroup.name,
+    accountName: storageAccount.name,
+    publicAccess: storage.PublicAccess.None,
+});
+
+const blob = new storage.Blob(`${baseName}-blob`, {
+    resourceGroupName: resourceGroup.name,
+    accountName: storageAccount.name,
+    containerName: storageContainer.name,
+    source: new pulumi.asset.FileArchive("wwwroot"),
+});
+
+const codeBlobUrl = getSASToken(storageAccount.name, storageContainer.name, blob.name, resourceGroup.name);
+
+const appInsights = new insights.Component("ai", {
+    resourceGroupName: resourceGroup.name,
+    kind: "web",
+    applicationType: insights.ApplicationType.Web,
+});
+
+const sqlServer = new sql.Server("sqlserver", {
+    resourceGroupName: resourceGroup.name,
+    administratorLogin: username,
+    administratorLoginPassword: pwd,
+    version: "12.0",
+});
+
+const database = new sql.Database("db", {
+    resourceGroupName: resourceGroup.name,
+    serverName: sqlServer.name,
+    sku: {
+        name: "S0",
+    },
+});
+
+const app = new web.WebApp("webapp", {
+    resourceGroupName: resourceGroup.name,
+    serverFarmId: appServicePlan.id,
+    siteConfig: {
+        appSettings: [
+            {
+                name: "APPINSIGHTS_INSTRUMENTATIONKEY",
+                value: appInsights.instrumentationKey,
+            },
+            {
+                name: "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                value: pulumi.interpolate`InstrumentationKey=${appInsights.instrumentationKey}`,
+            },
+            {
+                name: "ApplicationInsightsAgent_EXTENSION_VERSION",
+                value: "~2",
+            },
+            {
+                name: "WEBSITE_RUN_FROM_PACKAGE",
+                value: codeBlobUrl,
+            },
+        ],
+        connectionStrings: [{
+            name: "db",
+            connectionString:
+                pulumi.all([sqlServer.name, database.name]).apply(([server, db]) =>
+                    `Server=tcp:${server}.database.windows.net;initial catalog=${db};user ID=${username};password=${pwd};Min Pool Size=0;Max Pool Size=30;Persist Security Info=true;`),
+            type: web.ConnectionStringType.SQLAzure,
+        }],
+    },
+});
+
+export const dbUserName = username;
+export const dbPassword = pwd;
+export const storageAccountKey = primaryStorageKey;
+export const appHostName = app.defaultHostName;
+
+
+
+/////// Helper Function ///////
+function getSASToken(storageAccountName: pulumi.Input<string>,
+    storageContainerName: pulumi.Input<string>,
+    blobName: pulumi.Input<string>,
+    resourceGroupName: pulumi.Input<string>): pulumi.Output<string> {
+const blobSAS = storage.listStorageAccountServiceSASOutput({
+accountName: storageAccountName,
+protocols: storage.HttpProtocol.Https,
+sharedAccessStartTime: "2021-01-01",
+sharedAccessExpiryTime: "2030-01-01",
+resource: storage.SignedResource.C,
+resourceGroupName: resourceGroupName,
+permissions: storage.Permissions.R,
+canonicalizedResource: pulumi.interpolate `/blob/${storageAccountName}/${storageContainerName}`,
+contentType: "application/json",
+cacheControl: "max-age=5",
+contentDisposition: "inline",
+contentEncoding: "deflate",
+});
+const token = blobSAS.apply(x => x.serviceSasToken);
+return pulumi.interpolate `https://${storageAccountName}.blob.core.windows.net/${storageContainerName}/${blobName}?${token}`;
+}
