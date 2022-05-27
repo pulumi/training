@@ -1,6 +1,3 @@
-name: stack_advanced_topics
-runtime:
-  name: python
-  options:
-    virtualenv: venv
-description: Stack advanced topics exercises
+name: stack-advanced-topics
+runtime: nodejs
+description: A minimal Azure Native TypeScript Pulumi program
