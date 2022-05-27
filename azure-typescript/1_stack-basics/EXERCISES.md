@@ -5,7 +5,7 @@ Related Docs:
 - https://www.pulumi.com/docs/intro/concepts/stack/#outputs
 
 # Exercise 2: 
-Use stack configuration to set the resource group name instead of using the hard-coded, string 'resource_group'  
+Use stack configuration to set the resource group name instead of using the hard-coded, string 'resourceGroup'  
 Hint: Require a configuration parameter named "base_name" that you can then use as a basis for resource names.  
 
 Related Docs:
