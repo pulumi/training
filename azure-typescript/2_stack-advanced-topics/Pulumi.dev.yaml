@@ -1,8 +1,0 @@
-config:
-  azure-native:location: WestUS
-  stack-advanced-topics:adminUserName:
-    secure: AAABAOJU6g/YHtGeMi46FH4r1OIZT9SYYbfJuZb46686iXGFbUM=
-  stack-advanced-topics:password: IacRocks419
-  stack-advanced-topics:sqlPassword:
-    secure: AAABAKEvPsIYyf1fLYBE49NZ/QB9yVybzLw/uAUB332ukFwpCwQYbM2e1Gw=
-  stack-advanced-topics:username: pulumi
