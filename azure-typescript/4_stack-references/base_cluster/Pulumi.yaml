@@ -1,6 +1,0 @@
-name: stack_references_base_cluster
-runtime:
-  name: python
-  options:
-    virtualenv: venv
-description: Stack references exercises
