@@ -1,6 +1,3 @@
 name: component_resources
-runtime:
-  name: python
-  options:
-    virtualenv: venv
-description: Pulumi component resource exercises
+runtime: nodejs
+description: Pulumi Workshop - Azure Typescript component resources

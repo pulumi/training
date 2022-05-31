@@ -1,0 +1,3 @@
+config:
+  component_resources:sqlPassword:
+    secure: AAABAO2bH+GECWH4LKiNejvOSwfuWt6pn1noSCinycjKMagn1LiBbuQRLn8=
