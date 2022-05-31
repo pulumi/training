@@ -5,9 +5,15 @@ import * as storage from "@pulumi/azure-native/storage";
 import * as web from "@pulumi/azure-native/web";
 import * as pulumi from "@pulumi/pulumi";
 
+
+// Get the password to use for SQL from config.
 const config = new pulumi.Config();
 const baseName = config.get("baseName") || pulumi.getStack();
 const username = config.get("sqlUsername") || "pulumi";
+// Exercise 1 //
+const pwd = config.requireSecret("sqlPassword");
+export const dbPassword = pwd;
+// Exercise 1 //
 
 const resourceGroup = new resource.ResourceGroup(`${baseName}-rg`);
 
@@ -22,7 +28,10 @@ const storageAccount = new storage.StorageAccount(`${baseName.toLowerCase()}sa`,
 
 const storageAccountKeys = pulumi.all([resourceGroup.name, storageAccount.name]).apply(([resourceGroupName, accountName]) =>
     storage.listStorageAccountKeys({ resourceGroupName, accountName }));
-const primaryStorageKey = storageAccountKeys.keys[0].value;
+
+// Exercise 2/2a //
+const primaryStorageKey = pulumi.secret(storageAccountKeys.keys[0].value);
+// Exercise 2/2a //
 
 const appServicePlan = new web.AppServicePlan(`${baseName}-asp`, {
     resourceGroupName: resourceGroup.name,
@@ -102,7 +111,6 @@ const app = new web.WebApp(`${baseName}-webapp`, {
 });
 
 export const dbUserName = username;
-export const dbPassword = pwd;
 export const storageAccountKey = primaryStorageKey;
 export const appHostName = app.defaultHostName;
 

@@ -5,9 +5,8 @@ import * as storage from "@pulumi/azure-native/storage";
 import * as web from "@pulumi/azure-native/web";
 import * as pulumi from "@pulumi/pulumi";
 
-const config = new pulumi.Config();
-const baseName = config.get("baseName") || pulumi.getStack();
-const username = config.get("sqlUsername") || "pulumi";
+import {baseName, username, pwd} from "./config";
+import {getSASToken} from "./utilities"
 
 const resourceGroup = new resource.ResourceGroup(`${baseName}-rg`);
 
@@ -22,7 +21,7 @@ const storageAccount = new storage.StorageAccount(`${baseName.toLowerCase()}sa`,
 
 const storageAccountKeys = pulumi.all([resourceGroup.name, storageAccount.name]).apply(([resourceGroupName, accountName]) =>
     storage.listStorageAccountKeys({ resourceGroupName, accountName }));
-const primaryStorageKey = storageAccountKeys.keys[0].value;
+const primaryStorageKey = pulumi.secret(storageAccountKeys.keys[0].value);
 
 const appServicePlan = new web.AppServicePlan(`${baseName}-asp`, {
     resourceGroupName: resourceGroup.name,
@@ -105,27 +104,6 @@ export const dbUserName = username;
 export const dbPassword = pwd;
 export const storageAccountKey = primaryStorageKey;
 export const appHostName = app.defaultHostName;
-
-
-/////// Helper Function ///////
-function getSASToken(storageAccountName: pulumi.Input<string>,
-    storageContainerName: pulumi.Input<string>,
-    blobName: pulumi.Input<string>,
-    resourceGroupName: pulumi.Input<string>): pulumi.Output<string> {
-const blobSAS = storage.listStorageAccountServiceSASOutput({
-accountName: storageAccountName,
-protocols: storage.HttpProtocol.Https,
-sharedAccessStartTime: "2021-01-01",
-sharedAccessExpiryTime: "2030-01-01",
-resource: storage.SignedResource.C,
-resourceGroupName: resourceGroupName,
-permissions: storage.Permissions.R,
-canonicalizedResource: pulumi.interpolate `/blob/${storageAccountName}/${storageContainerName}`,
-contentType: "application/json",
-cacheControl: "max-age=5",
-contentDisposition: "inline",
-contentEncoding: "deflate",
-});
-const token = blobSAS.apply(x => x.serviceSasToken);
-return pulumi.interpolate `https://${storageAccountName}.blob.core.windows.net/${storageContainerName}/${blobName}?${token}`;
-}
+export const urlWrongWay = `https://${appHostName}`
+export const urlInterpolateWay = pulumi.interpolate`https://${appHostName}`
+export const urlApplyWay = appHostName.apply(hostName =>  `https://${hostName}`)
