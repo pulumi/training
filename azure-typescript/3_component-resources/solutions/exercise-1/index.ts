@@ -5,38 +5,36 @@ import * as storage from "@pulumi/azure-native/storage";
 import * as web from "@pulumi/azure-native/web";
 import * as pulumi from "@pulumi/pulumi";
 
+// Exercise 1 //
+import {StorageInfra, StorageInfraArgs} from "./storage-infra";
+// Exercise 1 //
+
 import {baseName, username, pwd} from "./config";
 import {getSASToken} from "./utilities"
 
 const resourceGroup = new resource.ResourceGroup(`${baseName}-rg`);
 
-// Storage Account name must be lowercase and cannot have any dash characters
-const storageAccount = new storage.StorageAccount(`${baseName.toLowerCase()}sa`, {
+const storageInfra = new StorageInfra(baseName, {
+    resourceGroupName: resourceGroup.name
+})
+
+const appServicePlan = new web.AppServicePlan(`${baseName}-asp`, {
     resourceGroupName: resourceGroup.name,
-    kind: storage.Kind.StorageV2,
+    kind: "App",
     sku: {
-        name: storage.SkuName.Standard_LRS,
+        name: "B1",
+        tier: "Basic",
     },
-});
-
-const storageAccountKeys = pulumi.all([resourceGroup.name, storageAccount.name]).apply(([resourceGroupName, accountName]) =>
-    storage.listStorageAccountKeys({ resourceGroupName, accountName }));
-const primaryStorageKey = pulumi.secret(storageAccountKeys.keys[0].value);
-
-const storageContainer = new storage.BlobContainer(`${baseName}-container`, {
-    resourceGroupName: resourceGroup.name,
-    accountName: storageAccount.name,
-    publicAccess: storage.PublicAccess.None,
 });
 
 const blob = new storage.Blob(`${baseName}-blob`, {
     resourceGroupName: resourceGroup.name,
-    accountName: storageAccount.name,
-    containerName: storageContainer.name,
+    accountName: storageInfra.storageAccountName,
+    containerName: storageInfra.storageContainerName,
     source: new pulumi.asset.FileArchive("wwwroot"),
 });
 
-const codeBlobUrl = getSASToken(storageAccount.name, storageContainer.name, blob.name, resourceGroup.name);
+const codeBlobUrl = getSASToken(storageInfra.storageAccountName, storageInfra.storageContainerName, blob.name, resourceGroup.name);
 
 const appInsights = new insights.Component(`${baseName}-ai`, {
     resourceGroupName: resourceGroup.name,
@@ -56,15 +54,6 @@ const database = new sql.Database(`${baseName}-db`, {
     serverName: sqlServer.name,
     sku: {
         name: "S0",
-    },
-});
-
-const appServicePlan = new web.AppServicePlan(`${baseName}-asp`, {
-    resourceGroupName: resourceGroup.name,
-    kind: "App",
-    sku: {
-        name: "B1",
-        tier: "Basic",
     },
 });
 
@@ -102,8 +91,6 @@ const app = new web.WebApp(`${baseName}-webapp`, {
 
 export const dbUserName = username;
 export const dbPassword = pwd;
-export const storageAccountKey = primaryStorageKey;
+export const storageAccountKey = storageInfra.storageKey;
 export const appHostName = app.defaultHostName;
-export const urlWrongWay = `https://${appHostName}`
-export const urlInterpolateWay = pulumi.interpolate`https://${appHostName}`
-export const urlApplyWay = appHostName.apply(hostName =>  `https://${hostName}`)
+export const url = pulumi.interpolate`https://${appHostName}`
