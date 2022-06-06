@@ -17,5 +17,5 @@ To ensure the most efficient use of workshop time, each student should go throug
 1. Make sure you have the latest version of the pulumi cli installed  
 (see: https://www.pulumi.com/docs/get-started/install/)
 
-1. To make sure you have access to a Pulumi account, run `pulumi login`
-1. To make sure you have access to an Azure account, run `az login`
+1. Make sure you have access to a Pulumi account, run `pulumi login`
+1. Make sure you have access to an Azure account, run `az login`
