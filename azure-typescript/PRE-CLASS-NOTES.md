@@ -9,7 +9,15 @@ To ensure the most efficient use of workshop time, each student should go throug
 1. Make sure you have access to an Azure account, run `az login`
 
 ## Set Up Workshop Environments
-This will install the base workshop code and related typescript packages
+This will install the base workshop code and related typescript packages. 
+When done you should have a directory structure like:
+```
+azure-typescript-workshop
+|- stack-basics
+|- stack-advanced-topics
+|- component-resources
+|- stack-references
+```
 
 1. `mkdir azure-typescript-workshop && cd azure-typescript-workshop`
 
