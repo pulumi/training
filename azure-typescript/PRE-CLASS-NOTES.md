@@ -33,7 +33,4 @@ azure-typescript-workshop
 9. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/3_component-resources`
 10. `cd ..`
 11. `mkdir stack-references && cd stack-references`
-12. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/3_component-resources`
-
-
-
+12. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/4_stack-references`
