@@ -26,8 +26,8 @@ azure-typescript-workshop
 2. `mkdir stack-basics && cd stack-basics`
 3. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/1_stack-basics`
 4. `cd ..`
-5. `mkdir stack-advanced-topcs && cd stack-advanced-topics`
-6. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/2_stack-advanced-topcs`
+5. `mkdir stack-advanced-topics && cd stack-advanced-topics`
+6. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/2_stack-advanced-topics`
 7. `cd ..`
 8. `mkdir component-resources && cd component-resources`
 9. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/3_component-resources`
