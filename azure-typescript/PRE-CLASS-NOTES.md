@@ -17,6 +17,8 @@ azure-typescript-workshop
 |- stack-advanced-topics
 |- component-resources
 |- stack-references
+   |- base-infra
+   |- app
 ```
 
 1. `mkdir azure-typescript-workshop && cd azure-typescript-workshop`
@@ -33,4 +35,9 @@ azure-typescript-workshop
 9. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/3_component-resources`
 10. `cd ..`
 11. `mkdir stack-references && cd stack-references`
-12. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/4_stack-references`
+12. `mkdir base-infra && cd base-infra`
+13. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/4_stack-references/base-infra`
+14. `cd ..`
+15. `mkdir app && cd app`
+16. `pulumi new https://github.com/pulumi/training/tree/main/azure-typescript/4_stack-references/app`
+
