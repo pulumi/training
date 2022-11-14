@@ -30,7 +30,3 @@ Hint: The value of `appHostName` is not known until after deployment. So it's an
 
 Related Docs:
 - Inputs and Outputs Doc: https://www.pulumi.com/docs/intro/concepts/inputs-outputs/
-
-# Exercise 4: 
-Make the code more modular and readable by moving config and related set up to it's own file and move the helper function to it's own file.
-Hint: This is simply using standard C# approaches to putting code blocks in separate files, be imported into the main program and referenced accordingly.  

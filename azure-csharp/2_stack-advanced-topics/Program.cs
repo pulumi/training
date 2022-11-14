@@ -3,5 +3,5 @@ using Pulumi;
 
 class Program
 {
-    static Task<int> Main() => Deployment.RunAsync<Ex3_StackAdvanced>();
+    static Task<int> Main() => Deployment.RunAsync<StackAdvanced>();
 }

@@ -1,5 +1,0 @@
-config:
-  azure-native:location: CentralUS
-  stack-advanced-topics:baseName: mitch
-  stack-advanced-topics:sqlPassword:
-    secure: AAABABPqKORu80SfAntlHJGdkjK4fcn8KZVnVaSRebr1GQIEu6jdEPD7rA8=
