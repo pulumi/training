@@ -1,8 +1,9 @@
 # Exercise 1: 
 Create a reusable "storage infra" component resource that encapsulates the logic for creating the following resources:
 * Storage Account
-* Storage Account Key
 * Storage Container
+* Storage Blob
+* Storage CodeBlobUrl
 
 The component resource should take the following input parameters:
 * resource group name
@@ -10,7 +11,8 @@ The component resource should take the following input parameters:
 The component resource should have the following output properties:
 * storage account name
 * storage container name  
-* storage key
+* storage blob name
+* storage code blob url
 
 Note: An empty "storage-infra" component resource shell is provided as an outline.
 
