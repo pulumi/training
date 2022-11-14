@@ -1,0 +1,10 @@
+{
+    "name": "component-resources",
+    "devDependencies": {
+        "@types/node": "^14"
+    },
+    "dependencies": {
+        "@pulumi/azure-native": "^1.64.1",
+        "@pulumi/pulumi": "^3.33.2"
+    }
+}
