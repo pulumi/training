@@ -13,8 +13,22 @@ class StackRefsApp: Stack
     {
         var config = new Config();
         var baseName = config.Require("baseName");
+        var baseStackProjectName  = config.Require("baseStackProjectName");
         var username = config.Get("sqlAdmin") ?? "pulumi";
         var password = config.RequireSecret("sqlPassword");
+
+        // Exercise 1
+        // Build stack reference to get information from base infra stack
+        var stackName = Pulumi.Deployment.Instance.StackName;
+        var orgName = Pulumi.Deployment.Instance.OrganizationName;
+        var baseStackName = $"{orgName}/{baseStackProjectName}/{stackName}";
+        var baseStackRef = new StackReference(baseStackName);
+        var ResourceGroupName = stackOutput(baseStackRef, "ResourceGroupName");
+        var StorageAccountName = stackOutput(baseStackRef, "StorageAccountName");
+        var StorageContainerName = stackOutput(baseStackRef, "StorageContainerName");
+        var AppServicePlanId = stackOutput(baseStackRef, "AppServicePlanId");
+        var AppInsightsInstrumentationKey = stackOutput(baseStackRef, "AppInsightsInstrumentationKey");
+        var SqlConnectionString = stackOutput(baseStackRef, "SqlConnectionString");
 
         var blob = new Blob($"{baseName}-appservice-blob", new BlobArgs
         {
@@ -63,6 +77,11 @@ class StackRefsApp: Stack
         });
 
         this.Endpoint = Output.Format($"https://{app.DefaultHostName}");
+    }
+
+    private static Output<string> stackOutput (StackReference stackref, string stackOutputName)
+    {
+        return Output.Format($"{stackref.RequireOutput(stackOutputName).Apply(v => v.ToString())}");
     }
 
     private static Output<string> SignedBlobReadUrl(Output<string> blobName, Output<string> containerName, Output<string> accountName, Output<string> resourceGroupName)
