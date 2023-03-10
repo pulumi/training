@@ -17,23 +17,23 @@ aws-typescript-workshop
    |- app
 ```
 
-1. `mkdir aws-typescript-workshop && cd aws-typescript-workshop`
-
 **NOTE:** When running `pulumi new` below, if you are going to use your Pulumi organization account instead of your personal Pulumi account, use `YOUR-ORGANIZATION-NAME/YOUR-NAME` when prompted for a stack name. This will create the stack in your organization and by using your name will avoid stack naming conflicts.
 
-2. `mkdir stack-basics && cd stack-basics`
-3. `pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/1_stack-basics`
-4. `cd ..`
-5. `mkdir stack-advanced-topics && cd stack-advanced-topics`
-6. `pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/2_stack-advanced-topics`
-7. `cd ..`
-8. `mkdir component-resources && cd component-resources`
-9. `pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/3_component-resources`
-10. `cd ..`
-11. `mkdir stack-references && cd stack-references`
-12. `mkdir base-infra && cd base-infra`
-13. `pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/base-infra`
-14. `cd ..`
-15. `mkdir app && cd app`
-16. `pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/app`
+```bash
+mkdir aws-typescript-workshop && cd aws-typescript-workshop
+mkdir stack-basics && cd stack-basics
+pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/1_stack-basics
+cd ..
+mkdir stack-advanced-topics && cd stack-advanced-topics`
+pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/2_stack-advanced-topics
+cd ..
+mkdir component-resources && cd component-resources
+pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/3_component-resources
+cd ..
+mkdir stack-references && cd stack-references
+mkdir base-infra && cd base-infra
+pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/base-infra
+cd ..
+mkdir app && cd app
+pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/app
 
