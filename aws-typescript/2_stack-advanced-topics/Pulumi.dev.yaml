@@ -1,4 +1,0 @@
-config:
-  aws:region: us-east-1
-  stack-advanced-topics:dbPassword:
-    secure: AAABAJvmvrH4vCuiMs810w7u05tjNUdEWTlOIm/6Vhy0pRffBNPAphsSYp4=
