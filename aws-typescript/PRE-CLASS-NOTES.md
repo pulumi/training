@@ -2,15 +2,11 @@
 To ensure the most efficient use of workshop time, each student should go through the following steps to set up the environment to use for the workshop.
 
 ## Prerequisites
-1. Make sure you have the latest version of the pulumi cli installed  
-(see: https://www.pulumi.com/docs/get-started/install/)
-
-1. Make sure you have access to a Pulumi account, run `pulumi login`
-1. Make sure you have access to an AWS account, run `aws login`
+1. Go through the AWS getting started for typescript found here: https://www.pulumi.com/docs/get-started/aws/ 
 
 ## Set Up Workshop Environments
 This will install the base workshop code and related typescript packages. 
-When done you should have a directory structure like:
+When done you should have a directory structure like this:
 ```
 aws-typescript-workshop
 |- stack-basics
