@@ -4,3 +4,5 @@ import * as resources from "@pulumi/azure-native/resources";
 // Create an Azure Resource Group
 const resourceGroup = new resources.ResourceGroup("resourceGroup");
 
+export const resourceGroupName = resourceGroup.name
+
