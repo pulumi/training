@@ -21,19 +21,26 @@ aws-typescript-workshop
 
 ```bash
 mkdir aws-typescript-workshop && cd aws-typescript-workshop
+
 mkdir stack-basics && cd stack-basics
 pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/1_stack-basics
 cd ..
-mkdir stack-advanced-topics && cd stack-advanced-topics`
+
+mkdir stack-advanced-topics && cd stack-advanced-topics
 pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/2_stack-advanced-topics
 cd ..
+
 mkdir component-resources && cd component-resources
 pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/3_component-resources
 cd ..
+
 mkdir stack-references && cd stack-references
+
 mkdir base-infra && cd base-infra
 pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/base-infra
 cd ..
+
 mkdir app && cd app
 pulumi new https://github.com/pulumi/training/tree/main/aws-typescript/4_stack-references/app
+
 
