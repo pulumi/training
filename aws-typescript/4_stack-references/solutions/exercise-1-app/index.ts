@@ -9,6 +9,15 @@ const baseName = config.get("baseName") || `${pulumi.getOrganization()}-${pulumi
 // Need to create a stack reference that points to the dev stack for the "base-infra" project.
 // And then get the applicable outputs from the "base-infra" stack and use them when creating the "app" stack resources.
 /////
+// The app stack can't run without the base infra stack, so require this configuration item.
+const baseInfraProjectName = config.require("baseInfraProjectName");
+// Using the base infra project name, build a full stack name based on the current app stack running.
+const baseInfraStackName = `${pulumi.getOrganization()}/${baseInfraProjectName}/${pulumi.getStack()}`;
+// Now create a stack reference using the base infra stack name.
+const baseInfraStackRef = new pulumi.StackReference(baseInfraStackName);
+// And now get the applicable outputs from the base stack needed to deploy the app stack.
+const vpcId = baseInfraStackRef.getOutput("vpcId");
+const webserverSubnetId = baseInfraStackRef.getOutput("webserverSubnetId");
 
 // Create an EC2 instance running a simple web server.
 // Get the id for the latest Amazon Linux AMI
@@ -22,7 +31,7 @@ const ami = aws.ec2.getAmi({
 
 // create a new security group for port 80
 const group = new aws.ec2.SecurityGroup(`${baseName}-secgrp`, {
-  vpcId: vpc.vpcId,
+  vpcId: vpcId,
   ingress: [
       { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: ["0.0.0.0/0"] },
   ],
@@ -36,7 +45,7 @@ nohup python -m SimpleHTTPServer 80 &`;
 
 const serverName = `${baseName}-web-server`;
 const server = new aws.ec2.Instance(serverName, {
-  subnetId: vpc.publicSubnetIds[0],
+  subnetId: webserverSubnetId,
   tags: { "Name": serverName },
   instanceType: aws.ec2.InstanceType.T3_Micro, 
   vpcSecurityGroupIds: [ group.id ], // reference the group object above
