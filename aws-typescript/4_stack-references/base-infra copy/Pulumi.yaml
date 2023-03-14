@@ -1,3 +1,0 @@
-name: stack_references_base_infra 
-runtime: nodejs
-description: Pulumi Workshop - AWS Typescript stack references base infrastructure project
