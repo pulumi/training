@@ -6,12 +6,19 @@ from pulumi import Config
 from pulumi_tls import PrivateKey
 from pulumi_azure_native import resources, containerservice
 import pulumi_azuread as azuread
+import pulumi_azure as azure
 import pulumi_kubernetes as k8s
+from pulumi_kubernetes.helm.v3 import Chart, ChartOpts
 
 config = Config()
-k8s_version = config.get('k8sVersion') or '1.19.11'
+
+# Get lastest k8s version
+supported_k8s_versions = azure.containerservice.get_kubernetes_service_versions(location="West Europe")
+latest_k8s_version = supported_k8s_versions.latest_version 
+k8s_version = config.get('k8sVersion') or latest_k8s_version
 node_count = config.get_int('nodeCount') or 2
 node_size = config.get('nodeSize') or 'Standard_D2_v2'
+admin_username = config.get('adminUserName') or 'testuser'
 
 generated_key_pair = PrivateKey('ssh-key',
     algorithm='RSA', rsa_bits=4096)
@@ -23,7 +30,7 @@ k8s_cluster = containerservice.ManagedCluster('cluster',
     resource_group_name=resource_group.name,
     agent_pool_profiles=[{
         'count': node_count,
-        'max_pods': 2,
+        'max_pods': 20,
         'mode': 'System',
         'name': 'agentpool',
         'node_labels': {},
@@ -67,16 +74,16 @@ kubeconfig = creds.kubeconfigs[0].value.apply(
 k8s_provider = k8s.Provider('k8s-provider', kubeconfig=kubeconfig)
 
 # Create a chart resource to deploy apache using the k8s provider instantiated above.
-apache = k8s.Chart('apache-chart',
-    k8s.ChartOpts(
+apache = Chart('apache-chart',
+    ChartOpts(
         chart='apache',
-        version='8.3.2',
+        version='9.4.1', # See https://artifacthub.io/packages/helm/bitnami/apache for latest chart versions.
         fetch_opts={'repo': 'https://charts.bitnami.com/bitnami'}),
     opts=pulumi.ResourceOptions(provider=k8s_provider))
 
 # Get the helm-deployed apache service IP which isn't known until the chart is deployed.
-apache_service_ip = apache.get_resource('v1/Service', 'apache-chart').apply(
-    lambda res: res.status.load_balancer.ingress[0].ip)
+apache_service_ip = creds.kubeconfigs[0].value.apply(lambda creds: apache.get_resource('v1/Service', 'apache-chart', 'default').apply(
+    lambda res: res.status.load_balancer.ingress[0].ip))
 
 pulumi.export('resource_group_name', resource_group.name)
 pulumi.export('cluster_name', k8s_cluster.name)
