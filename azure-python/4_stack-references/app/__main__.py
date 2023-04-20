@@ -13,7 +13,7 @@ k8s_provider = k8s.Provider('k8s-provider', kubeconfig=kubeconfig)
 apache = Chart('apache-chart',
     ChartOpts(
         chart='apache',
-        version='8.3.2',
+        version='9.4.1', # See https://artifacthub.io/packages/helm/bitnami/apache for latest chart versions.
         fetch_opts={'repo': 'https://charts.bitnami.com/bitnami'}),
     opts=ResourceOptions(provider=k8s_provider))
 

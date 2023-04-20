@@ -6,12 +6,16 @@ from pulumi import Config, ResourceOptions
 from pulumi_tls import PrivateKey
 from pulumi_azure_native import resources, containerservice
 import pulumi_azuread as azuread
+import pulumi_azure as azure
 import pulumi_kubernetes as k8s
 from pulumi_kubernetes.helm.v3 import Chart, ChartOpts
 import pulumi_random as random
 
 # Config values or defaults
 config = Config()
+supported_k8s_versions = azure.containerservice.get_kubernetes_service_versions(location="West Europe")
+latest_k8s_version = supported_k8s_versions.latest_version 
+k8s_version = config.get('k8sVersion') or latest_k8s_version
 k8s_version = config.get('k8sVersion') or '1.19.11'
 admin_username = config.get('adminUserName') or 'testuser'
 node_count = config.get_int('nodeCount') or 2
@@ -77,13 +81,13 @@ k8s_provider = k8s.Provider('k8s-provider', kubeconfig=kubeconfig)
 apache = Chart('apache-chart',
     ChartOpts(
         chart='apache',
-        version='8.3.2',
+        version='9.4.1', # See https://artifacthub.io/packages/helm/bitnami/apache for latest chart versions.
         fetch_opts={'repo': 'https://charts.bitnami.com/bitnami'}),
     opts=ResourceOptions(provider=k8s_provider))
 
 # Get the helm-deployed apache service IP which isn't known until the chart is deployed.
-apache_service_ip = apache.get_resource('v1/Service', 'apache-chart').apply(
-    lambda res: res.status.load_balancer.ingress[0].ip)
+apache_service_ip = creds.kubeconfigs[0].value.apply(lambda creds: apache.get_resource('v1/Service', 'apache-chart', 'default').apply(
+    lambda res: res.status.load_balancer.ingress[0].ip))
 
 # Correct option using "concat()"
 pulumi.export('Apache_URL', pulumi.Output.concat('http://', apache_service_ip)) 
