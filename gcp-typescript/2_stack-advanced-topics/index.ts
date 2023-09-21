@@ -10,11 +10,11 @@ const dbPwd = config.get("dbPassword") || "dbpassword"; // This creates a defaul
 
 // Create an CloudSQL resource
 const sqlInstance = new gcp.sql.DatabaseInstance(`${baseName}-sqldbinstance`, {
-    databaseVersion: "POSTGRES_15",    
+    databaseVersion: "POSTGRES_15",
+    deletionProtection: false,   
     settings: {
         tier: "db-f1-micro",
         diskSize: 20,
-        deletionProtectionEnabled: false,
     },
 });
 
