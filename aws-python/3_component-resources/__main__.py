@@ -9,7 +9,7 @@ vpc = awsx.ec2.Vpc(base_name)
 
 ami = aws.ec2.get_ami(most_recent=True,
                   owners=["137112412989"],
-                  filters=[aws.GetAmiFilterArgs(name="name", values=["amzn-ami-hvm-*"])])
+                  filters=[aws.ec2.GetAmiFilterArgs(name="name", values=["amzn2-ami-hvm-*"])])
 
 group = aws.ec2.SecurityGroup('web-secgrp',
     description='Enable HTTP access',
