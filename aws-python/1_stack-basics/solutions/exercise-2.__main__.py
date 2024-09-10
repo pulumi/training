@@ -11,4 +11,4 @@ base_name = config.require("base_name")
 bucket = s3.Bucket(f"{base_name}-bucket")
 ## Exercise 2 ##
 
-pulumi.export("Bucket Name", bucket.id)
+pulumi.export("bucket_name", bucket.id)

@@ -2,8 +2,8 @@ import pulumi
 from pulumi_aws import rds
 
 config = pulumi.Config()
-base_name = config.get("base_name") or f"{pulumi.get_organization()}-{pulumi.get_stack()}".lower()
-db_username = config.get("db_username") or "dbadmin"
+base_name = config.get("base_name", f"{pulumi.get_organization()}-{pulumi.get_stack()}".lower())
+db_username = config.get("db_username", "dbadmin")
 ## Exercise 1 ##
 db_password = config.require_secret("db_password")
 pulumi.export("db_password", db_password)
