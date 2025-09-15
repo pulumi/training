@@ -1,5 +1,5 @@
 using Pulumi;
-using Pulumi.AzureNative.Insights;
+using Pulumi.AzureNative.ApplicationInsights;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Sql;
 using Pulumi.AzureNative.Storage;
