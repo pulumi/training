@@ -1,0 +1,3 @@
+name: components-stack-refs-base-infra
+description: Pulumi Workshop - Azure C# components and stack references base infrastructure.
+runtime: dotnet

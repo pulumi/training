@@ -1,0 +1,3 @@
+name: components-stack-refs-storage
+description: Pulumi Workshop - Azure C# components and stack references storage.
+runtime: dotnet
