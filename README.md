@@ -1,3 +1,5 @@
+Content has been moved to https://github.com/pulumi/workshops/pulumi-basics
+
 # Pulumi Training
 
 This repo contains artifacts for Pulumi training sessions.  
